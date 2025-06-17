@@ -594,7 +594,7 @@
         document.getElementById("motivation-author").textContent = `- ${author}`;
     };
 
-    // --- TASK MANAGER ---
+    // --- TASK MANAGEMENT MODULE ---
     let tasks = load("tasks", []);
     let currentFilter = 'all';
 
@@ -657,7 +657,49 @@
         renderTasks();
     };
 
-    // --- BUDGET TRACKER ---
+    const addRecurringTask = (taskText, recurrence) => {
+        const task = {
+            id: Date.now(),
+            text: taskText,
+            isCompleted: false,
+            isImportant: false,
+            recurrence,
+            date: null,
+            time: null
+        };
+        tasks.push(task);
+        save("tasks", tasks);
+        renderTasks();
+        updateDashboard();
+    };
+
+    const suggestTaskPriorities = () => {
+        const sortedTasks = tasks
+            .filter(task => !task.isCompleted)
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+        console.log("Suggested Tasks:", sortedTasks);
+
+        // Smart suggestion based on past completion patterns
+        const completedTasks = tasks.filter(task => task.isCompleted);
+        const prioritySuggestions = sortedTasks.map(task => {
+            const completionRate = completedTasks.filter(t => t.text === task.text).length / completedTasks.length;
+            return { ...task, priorityScore: completionRate };
+        });
+        console.log("Priority Suggestions:", prioritySuggestions);
+    };
+
+    const renderCompletionStatistics = () => {
+        const completedTasks = tasks.filter(task => task.isCompleted).length;
+        const totalTasks = tasks.length;
+        const completionRate = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
+        document.getElementById("completionRate").textContent = `Completion Rate: ${completionRate}%`;
+
+        // Additional statistics
+        const importantTasksCompleted = tasks.filter(task => task.isCompleted && task.isImportant).length;
+        console.log(`Important Tasks Completed: ${importantTasksCompleted}`);
+    };
+
+    // --- BUDGET TRACKER MODULE ---
     let budget = load("budget", []);
 
     const renderBudget = () => {
@@ -706,7 +748,19 @@
         updateDashboard();
     };
 
-    // --- NOTES ---
+    const setMonthlyBudgetGoal = (goal) => {
+        localStorage.setItem("monthlyBudgetGoal", goal);
+        document.getElementById("monthlyBudgetGoal").textContent = `$${goal.toFixed(2)}`;
+    };
+
+    const renderSpendingInsights = () => {
+        const totalIncome = budget.filter(entry => entry.type === "income").reduce((sum, entry) => sum + entry.amount, 0);
+        const totalExpense = budget.filter(entry => entry.type === "expense").reduce((sum, entry) => sum + entry.amount, 0);
+        const insights = totalExpense > totalIncome ? "Consider reducing expenses." : "You're on track!";
+        document.getElementById("spendingInsights").textContent = insights;
+    };
+
+    // --- NOTES MODULE ---
     let notes = load("notes", []);
 
     const renderNotes = () => {
@@ -742,6 +796,22 @@
         save("notes", notes);
         renderNotes();
         updateDashboard();
+    };
+
+    const searchNotes = (query) => {
+        const filteredNotes = notes.filter(note => note.title.includes(query) || note.content.includes(query));
+        renderNotes(filteredNotes);
+    };
+
+    const renderRelatedNotes = (currentNote) => {
+        const relatedNotes = notes.filter(note => note.tags.some(tag => currentNote.tags.includes(tag)));
+        const list = document.getElementById("relatedNotes");
+        list.innerHTML = relatedNotes.map(note => `<li>${note.title}</li>`).join("") || "<li>No related notes found.</li>";
+    };
+
+    const renderMarkdownNote = (noteContent) => {
+        const markdownContent = marked(noteContent); // Use a markdown library like 'marked.js'
+        document.getElementById("markdownPreview").innerHTML = markdownContent;
     };
 
     // --- DASHBOARD ---
@@ -792,7 +862,11 @@
         const completedTasks = tasks.filter(task => task.isCompleted).length;
         const totalTasks = tasks.length;
         const completionRate = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
-        console.log(`Completion Rate: ${completionRate}%`);
+        document.getElementById("completionRate").textContent = `Completion Rate: ${completionRate}%`;
+
+        // Additional statistics
+        const importantTasksCompleted = tasks.filter(task => task.isCompleted && task.isImportant).length;
+        console.log(`Important Tasks Completed: ${importantTasksCompleted}`);
     };
 
     const suggestTaskPriorities = () => {
@@ -800,6 +874,14 @@
             .filter(task => !task.isCompleted)
             .sort((a, b) => new Date(a.date) - new Date(b.date));
         console.log("Suggested Tasks:", sortedTasks);
+
+        // Smart suggestion based on past completion patterns
+        const completedTasks = tasks.filter(task => task.isCompleted);
+        const prioritySuggestions = sortedTasks.map(task => {
+            const completionRate = completedTasks.filter(t => t.text === task.text).length / completedTasks.length;
+            return { ...task, priorityScore: completionRate };
+        });
+        console.log("Priority Suggestions:", prioritySuggestions);
     };
 
     // --- BUDGET DASHBOARD ---
@@ -847,7 +929,5 @@
 
     initialize();
 </script>
-</body>
-</html></script>
 </body>
 </html>
