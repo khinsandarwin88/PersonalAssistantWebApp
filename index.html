@@ -535,6 +535,9 @@
     </div>
 </div>
 
+<canvas id="budgetTrendsChart" width="400" height="200" style="display:none;"></canvas>
+<canvas id="productivityHeatmap" width="400" height="200" style="display:none;"></canvas>
+
 <script>
     // --- UTILITIES ---
     const load = (key, fallback = []) => {
@@ -668,6 +671,7 @@
         updateDashboard();
     };
 
+    // Consolidated definitions of `suggestTaskPriorities` and `renderCompletionStatistics`
     const suggestTaskPriorities = () => {
         const sortedTasks = tasks
             .filter(task => !task.isCompleted)
@@ -677,10 +681,22 @@
         // Smart suggestion based on past completion patterns
         const completedTasks = tasks.filter(task => task.isCompleted);
         const prioritySuggestions = sortedTasks.map(task => {
-            const completionRate = completedTasks.filter(t => t.text === task.text).length / completedTasks.length;
+            const completionRate = completedTasks.length ? completedTasks.filter(t => t.text === task.text).length / completedTasks.length : 0;
             return { ...task, priorityScore: completionRate };
         });
         console.log("Priority Suggestions:", prioritySuggestions);
+
+        // Productivity heatmap integration
+        const canvas = document.getElementById('productivityHeatmap');
+        const ctx = canvas.getContext('2d');
+        const totalTasks = tasks.length;
+        const completionRate = totalTasks ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
+        ctx.fillStyle = completionRate > 75 ? '#81c784' : completionRate > 50 ? '#ffb74d' : '#e57373';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '20px Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${completionRate}%`, canvas.width / 2, canvas.height / 2);
     };
 
     const renderCompletionStatistics = () => {
@@ -692,6 +708,33 @@
         // Additional statistics
         const importantTasksCompleted = tasks.filter(task => task.isCompleted && task.isImportant).length;
         console.log(`Important Tasks Completed: ${importantTasksCompleted}`);
+
+        // Budget trends chart integration
+        const canvas = document.getElementById('budgetTrendsChart');
+        const ctx = canvas.getContext('2d');
+        const incomeData = budget.filter(entry => entry.type === 'income').map(entry => entry.amount);
+        const expenseData = budget.filter(entry => entry.type === 'expense').map(entry => entry.amount);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({ length: incomeData.length }, (_, i) => `Month ${i + 1}`),
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: incomeData,
+                        borderColor: '#81c784',
+                        fill: false,
+                    },
+                    {
+                        label: 'Expense',
+                        data: expenseData,
+                        borderColor: '#e57373',
+                        fill: false,
+                    },
+                ],
+            },
+        });
     };
 
     // --- BUDGET TRACKER MODULE ---
@@ -809,6 +852,109 @@
         document.getElementById("markdownPreview").innerHTML = markdownContent;
     };
 
+    // --- THEME CUSTOMIZATION ---
+    const themes = {
+        professional: {
+            '--bg-main': '#f5f5f5',
+            '--text-dark': '#333333',
+            '--accent-primary': '#007bff',
+            '--accent-secondary': '#6c757d',
+            '--color-success': '#28a745',
+            '--color-danger': '#dc3545',
+        },
+        autisticFriendly: {
+            '--bg-main': '#ffffff',
+            '--text-dark': '#000000',
+            '--accent-primary': '#ffcc00',
+            '--accent-secondary': '#ff9900',
+            '--color-success': '#00cc66',
+            '--color-danger': '#ff3300',
+        },
+        dino: {
+            '--bg-main': '#fff0f5',
+            '--text-dark': '#6a1b9a',
+            '--accent-primary': '#ffb6c1',
+            '--accent-secondary': '#ffe4e1',
+            '--color-success': '#a5d6a7',
+            '--color-danger': '#ef9a9a',
+        },
+        simple: {
+            '--bg-main': '#ffffff',
+            '--text-dark': '#333333',
+            '--accent-primary': '#cccccc',
+            '--accent-secondary': '#e0e0e0',
+            '--color-success': '#4caf50',
+            '--color-danger': '#f44336',
+        },
+        dark: {
+            '--bg-main': '#121212',
+            '--text-dark': '#ffffff',
+            '--accent-primary': '#bb86fc',
+            '--accent-secondary': '#03dac6',
+            '--color-success': '#03dac6',
+            '--color-danger': '#cf6679',
+        },
+    };
+
+    const applyTheme = (themeName) => {
+        const theme = themes[themeName];
+        if (theme) {
+            Object.entries(theme).forEach(([key, value]) => {
+                document.documentElement.style.setProperty(key, value);
+            });
+            localStorage.setItem('theme', themeName);
+        }
+    };
+
+    const loadTheme = () => {
+        const savedTheme = localStorage.getItem('theme') || 'dino';
+        applyTheme(savedTheme);
+    };
+
+    // --- DATA VISUALIZATION ---
+    const renderBudgetTrendsChart = () => {
+        const canvas = document.getElementById('budgetTrendsChart');
+        const ctx = canvas.getContext('2d');
+        const incomeData = budget.filter(entry => entry.type === 'income').map(entry => entry.amount);
+        const expenseData = budget.filter(entry => entry.type === 'expense').map(entry => entry.amount);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({ length: incomeData.length }, (_, i) => `Month ${i + 1}`),
+                datasets: [
+                    {
+                        label: 'Income',
+                        data: incomeData,
+                        borderColor: '#81c784',
+                        fill: false,
+                    },
+                    {
+                        label: 'Expense',
+                        data: expenseData,
+                        borderColor: '#e57373',
+                        fill: false,
+                    },
+                ],
+            },
+        });
+    };
+
+    const renderProductivityHeatmap = () => {
+        const canvas = document.getElementById('productivityHeatmap');
+        const ctx = canvas.getContext('2d');
+        const completedTasks = tasks.filter(task => task.isCompleted).length;
+        const totalTasks = tasks.length;
+        const completionRate = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+        ctx.fillStyle = completionRate > 75 ? '#81c784' : completionRate > 50 ? '#ffb74d' : '#e57373';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '20px Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${completionRate}%`, canvas.width / 2, canvas.height / 2);
+    };
+
     // --- DASHBOARD ---
     const updateDashboard = () => {
         // Update Task Section
@@ -855,56 +1001,32 @@
         // Smart suggestion based on past completion patterns
         const completedTasks = tasks.filter(task => task.isCompleted);
         const prioritySuggestions = sortedTasks.map(task => {
-            const completionRate = completedTasks.filter(t => t.text === task.text).length / completedTasks.length;
+            const completionRate = completedTasks.length ? completedTasks.filter(t => t.text === task.text).length / completedTasks.length : 0;
             return { ...task, priorityScore: completionRate };
         });
         console.log("Priority Suggestions:", prioritySuggestions);
+
+        // Productivity heatmap integration
+        const canvas = document.getElementById('productivityHeatmap');
+        const ctx = canvas.getContext('2d');
+        const totalTasks = tasks.length;
+        const completionRate = totalTasks ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
+        ctx.fillStyle = completionRate > 75 ? '#81c784' : completionRate > 50 ? '#ffb74d' : '#e57373';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '20px Arial';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${completionRate}%`, canvas.width / 2, canvas.height / 2);
     };
 
-    // --- BUDGET DASHBOARD ---
-    const renderDashboardBudget = () => {
-        const totalIncome = budget.filter(entry => entry.type === "income").reduce((sum, entry) => sum + entry.amount, 0);
-        const totalExpense = budget.filter(entry => entry.type === "expense").reduce((sum, entry) => sum + entry.amount, 0);
-        const balance = totalIncome - totalExpense;
-
-        document.getElementById("dashboardIncome").textContent = `$${totalIncome.toFixed(2)}`;
-        document.getElementById("dashboardExpense").textContent = `$${totalExpense.toFixed(2)}`;
-        document.getElementById("dashboardBalance").textContent = `$${balance.toFixed(2)}`;
-    };
-
-    const renderBudgetChart = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        const income = budget.filter(entry => entry.type === "income").reduce((sum, entry) => sum + entry.amount, 0);
-        const expense = budget.filter(entry => entry.type === "expense").reduce((sum, entry) => sum + entry.amount, 0);
-
-        document.getElementById("dashboardBudget").appendChild(canvas);
-        canvas.id = "budgetChart";
-
-        new Chart(ctx, {
-            type: "doughnut",
-            data: {
-                labels: ["Income", "Expense"],
-                datasets: [{
-                    backgroundColor: ["#81c784", "#e57373"],
-                    data: [income, expense],
-                }],
-            },
-        });
-    };
-
-    // Call these functions in the initialize function
-    const initialize = () => {
+    document.addEventListener("DOMContentLoaded", () => {
         displayMotivationQuote();
         renderTasks();
         renderBudget();
         renderNotes();
-        renderDashboardTasks();
-        renderDashboardBudget();
-        renderDashboardNotes();
-    };
-
-    initialize();
+        updateDashboard();
+        loadTheme();
+    });
 </script>
 </body>
 </html>
