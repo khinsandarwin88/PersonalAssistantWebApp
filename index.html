@@ -75,6 +75,13 @@
             }
         }
 
+        .sections-row {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
         .section {
             background: var(--bg-section);
             padding: 2.5rem;
@@ -84,6 +91,9 @@
             flex-direction: column;
             border: 4px solid var(--accent-secondary);
             transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
         }
 
         .section:hover {
@@ -399,6 +409,10 @@
             body::before {
                 display: none;
             }
+
+            .sections-row {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -413,62 +427,63 @@
 
 <div class="main-container">
 
-    <div class="section">
-        <h2>🌿 Task Jungle</h2>
-        <div class="form-group vertical">
-            <input type="text" id="taskInput" placeholder="Hunt for a new task... 🍖" />
-            <input type="date" id="taskDate" />
-            <input type="time" id="taskTime" />
-            <div class="checkbox-group">
-                <input type="checkbox" id="taskImportant" />
-                <label for="taskImportant">Alpha Task? 👑</label>
+    <div class="sections-row">
+        <div class="section">
+            <h2>🌿 Task Jungle</h2>
+            <div class="form-group vertical">
+                <input type="text" id="taskInput" placeholder="Hunt for a new task... 🍖" />
+                <input type="date" id="taskDate" />
+                <input type="time" id="taskTime" />
+                <div class="checkbox-group">
+                    <input type="checkbox" id="taskImportant" />
+                    <label for="taskImportant">Alpha Task? 👑</label>
+                </div>
+                <button onclick="addTask()">Stomp on it! 🦖</button>
             </div>
-            <button onclick="addTask()">Stomp on it! 🦖</button>
-        </div>
-        <div class="task-filters">
-            <button id="filterAll" class="active" onclick="filterTasks('all')">All Expeditions</button>
-            <button id="filterActive" onclick="filterTasks('active')">Still Roaming</button>
-            <button id="filterCompleted" onclick="filterTasks('completed')">Conquered! 🔥</button>
-        </div>
-        <ul id="taskList"></ul>
-    </div>
-
-    <div class="section">
-        <h2>💎 Dino Budget</h2>
-        <div class="form-group vertical">
-            <input type="text" id="budgetDesc" placeholder="What shiny fossil did you find? (e.g., Rare Amber)" />
-            <input type="text" id="budgetCategory" placeholder="Fortune Type (e.g., Foraging, Nest Building)" />
-            <div class="form-group">
-                <input type="number" id="budgetAmount" placeholder="Amount (e.g., 5.00 glimmering geodes)" />
-                <select id="budgetType">
-                    <option value="expense">Spent (Uh oh! 😩)</option>
-                    <option value="income">Gained! (Cha-ching! ✨)</option>
-                </select>
+            <div class="task-filters">
+                <button id="filterAll" class="active" onclick="filterTasks('all')">All Expeditions</button>
+                <button id="filterActive" onclick="filterTasks('active')">Still Roaming</button>
+                <button id="filterCompleted" onclick="filterTasks('completed')">Conquered! 🔥</button>
             </div>
-            <button onclick="addBudget()">Unearth Fortune! ⛏️</button>
+            <ul id="taskList"></ul>
         </div>
-        <ul id="budgetList"></ul>
-        <div class="budget-totals">
-            <div>Gained!<span id="totalIncome" class="total-value">$0.00</span></div>
-            <div>Spent!<span id="totalExpense" class="total-value">$0.00</span></div>
-            <div>Balance<span id="finalBalance" class="total-value">$0.00</span></div>
-        </div>
-    </div>
 
-    <div class="section">
-        <h2>📜 Dino Notes</h2>
-        <div class="form-group vertical">
-            <input type="text" id="noteTitle" placeholder="A scroll title... (e.g., Best digging spots)" />
-            <textarea id="noteContent" placeholder="Scribe your ancient wisdom here... ✍️" rows="6"></textarea>
-            <div class="checkbox-group">
-                <input type="checkbox" id="noteImportant" />
-                <label for="noteImportant">Legendary Lore? 🌟</label>
+        <div class="section">
+            <h2>💎 Dino Budget</h2>
+            <div class="form-group vertical">
+                <input type="text" id="budgetDesc" placeholder="What shiny fossil did you find? (e.g., Rare Amber)" />
+                <input type="text" id="budgetCategory" placeholder="Fortune Type (e.g., Foraging, Nest Building)" />
+                <div class="form-group">
+                    <input type="number" id="budgetAmount" placeholder="Amount (e.g., 5.00 glimmering geodes)" />
+                    <select id="budgetType">
+                        <option value="expense">Spent (Uh oh! 😩)</option>
+                        <option value="income">Gained! (Cha-ching! ✨)</option>
+                    </select>
+                </div>
+                <button onclick="addBudget()">Unearth Fortune! ⛏️</button>
             </div>
-            <button onclick="addNote()">Scribe Scroll! 📝</button>
+            <ul id="budgetList"></ul>
+            <div class="budget-totals">
+                <div>Gained!<span id="totalIncome" class="total-value">$0.00</span></div>
+                <div>Spent!<span id="totalExpense" class="total-value">$0.00</span></div>
+                <div>Balance<span id="finalBalance" class="total-value">$0.00</span></div>
+            </div>
         </div>
-        <ul id="noteList"></ul>
-    </div>
 
+        <div class="section">
+            <h2>📜 Dino Notes</h2>
+            <div class="form-group vertical">
+                <input type="text" id="noteTitle" placeholder="A scroll title... (e.g., Best digging spots)" />
+                <textarea id="noteContent" placeholder="Scribe your ancient wisdom here... ✍️" rows="6"></textarea>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="noteImportant" />
+                    <label for="noteImportant">Legendary Lore? 🌟</label>
+                </div>
+                <button onclick="addNote()">Scribe Scroll! 📝</button>
+            </div>
+            <ul id="noteList"></ul>
+        </div>
+    </div>
 </div>
 
 <script>
