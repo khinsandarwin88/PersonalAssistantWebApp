@@ -374,6 +374,34 @@
             font-size: 1.15rem;
         }
 
+        /* Dashboard Specifics */
+        .dashboard {
+            margin-top: 2rem;
+            padding: 2rem;
+            background: var(--bg-section);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .dashboard-item {
+            background: var(--accent-secondary);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-item h3 {
+            font-family: var(--font-secondary);
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             body {
@@ -484,6 +512,32 @@
             <ul id="noteList"></ul>
         </div>
     </div>
+
+    <div class="dashboard">
+        <h2>🌟 Dino Dashboard</h2>
+        <div class="dashboard-grid">
+            <div class="dashboard-item">
+                <h3>Upcoming Tasks</h3>
+                <ul id="dashboardTasks"></ul>
+            </div>
+            <div class="dashboard-item">
+                <h3>Budget Overview</h3>
+                <div id="dashboardBudget">
+                    <p>Income: <span id="dashboardIncome">$0.00</span></p>
+                    <p>Expense: <span id="dashboardExpense">$0.00</span></p>
+                    <p>Balance: <span id="dashboardBalance">$0.00</span></p>
+                </div>
+            </div>
+            <div class="dashboard-item">
+                <h3>Recent Notes</h3>
+                <ul id="dashboardNotes"></ul>
+            </div>
+            <div class="dashboard-item">
+                <h3>Daily Recommendation</h3>
+                <p id="dashboardRecommendation">"Roar with purpose! The jungle awaits your greatness!"</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -576,6 +630,7 @@
         });
         save("tasks", tasks);
         renderTasks();
+        updateDashboard();
     };
 
     const toggleTask = id => {
@@ -584,6 +639,7 @@
             task.isCompleted = !task.isCompleted;
             save("tasks", tasks);
             renderTasks();
+            updateDashboard();
         }
     };
 
@@ -591,6 +647,7 @@
         tasks = tasks.filter(task => task.id !== id);
         save("tasks", tasks);
         renderTasks();
+        updateDashboard();
     };
 
     const filterTasks = filter => {
@@ -639,12 +696,14 @@
         budget.push({ desc, category, amount, type });
         save("budget", budget);
         renderBudget();
+        updateDashboard();
     };
 
     const removeBudget = index => {
         budget.splice(index, 1);
         save("budget", budget);
         renderBudget();
+        updateDashboard();
     };
 
     // --- NOTES ---
@@ -675,23 +734,120 @@
         });
         save("notes", notes);
         renderNotes();
+        updateDashboard();
     };
 
     const removeNote = index => {
         notes.splice(index, 1);
         save("notes", notes);
         renderNotes();
+        updateDashboard();
     };
 
-    // --- INITIALIZE APP ---
+    // --- DASHBOARD ---
+    const updateDashboard = () => {
+        // Update Task Section
+        const upcomingTasks = tasks.filter(task => !task.isCompleted).slice(0, 3);
+        const dashboardTasks = document.getElementById("dashboardTasks");
+        dashboardTasks.innerHTML = upcomingTasks.length ? upcomingTasks.map(task => `<li>${task.text} - ${task.date} ${task.time ? `at ${task.time}` : ''}</li>`).join('') : '<li>No upcoming tasks!</li>';
+
+        // Update Budget Section
+        const totalIncome = budget.filter(entry => entry.type === 'income').reduce((sum, entry) => sum + entry.amount, 0);
+        const totalExpense = budget.filter(entry => entry.type === 'expense').reduce((sum, entry) => sum + entry.amount, 0);
+        document.getElementById("dashboardIncome").textContent = `$${totalIncome.toFixed(2)}`;
+        document.getElementById("dashboardExpense").textContent = `$${totalExpense.toFixed(2)}`;
+        document.getElementById("dashboardBalance").textContent = `$${(totalIncome - totalExpense).toFixed(2)}`;
+
+        // Update Notes Section
+        const recentNotes = notes.slice(0, 5);
+        const dashboardNotes = document.getElementById("dashboardNotes");
+        dashboardNotes.innerHTML = recentNotes.map(note => `<li>${note.title}</li>`).join("") || "<li>No recent notes!</li>";
+
+        // Update Recommendation Section
+        const recommendations = [
+            "Roar with purpose! The jungle awaits your greatness!",
+            "Stomp out your worries and dance with delight!",
+            "Be as curious as a hatchling exploring new lands!",
+            "Grow tall and reach for the sunlight, like the mightiest ferns!",
+            "Your roar is unique and powerful! Let it be heard!",
+            "Dig deep for your inner strength; it's there!",
+            "Every footprint you leave makes a path. Keep stomping!",
+            "You're built for adventure! Go explore your potential!",
+            "Gather your strengths like a mighty Triceratops!",
+            "Let your ideas hatch and grow into something grand!",
+            "The ancient forests hold endless possibilities for you!",
+            "Shine brighter than a freshly unearthed geode!"
+        ];
+        const randomRecommendation = recommendations[Math.floor(Math.random() * recommendations.length)];
+        document.getElementById("dashboardRecommendation").textContent = randomRecommendation;
+    };
+
+    const renderDashboardTasks = () => {
+        const dashboardTasks = tasks.filter(task => !task.isCompleted).slice(0, 5);
+        const list = document.getElementById("dashboardTasks");
+        list.innerHTML = dashboardTasks.map(task => `<li>${task.text} - Due: ${task.date || "N/A"}</li>`).join("") || "<li>No upcoming tasks!</li>";
+    };
+
+    const renderCompletionStatistics = () => {
+        const completedTasks = tasks.filter(task => task.isCompleted).length;
+        const totalTasks = tasks.length;
+        const completionRate = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
+        console.log(`Completion Rate: ${completionRate}%`);
+    };
+
+    const suggestTaskPriorities = () => {
+        const sortedTasks = tasks
+            .filter(task => !task.isCompleted)
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+        console.log("Suggested Tasks:", sortedTasks);
+    };
+
+    // --- BUDGET DASHBOARD ---
+    const renderDashboardBudget = () => {
+        const totalIncome = budget.filter(entry => entry.type === "income").reduce((sum, entry) => sum + entry.amount, 0);
+        const totalExpense = budget.filter(entry => entry.type === "expense").reduce((sum, entry) => sum + entry.amount, 0);
+        const balance = totalIncome - totalExpense;
+
+        document.getElementById("dashboardIncome").textContent = `$${totalIncome.toFixed(2)}`;
+        document.getElementById("dashboardExpense").textContent = `$${totalExpense.toFixed(2)}`;
+        document.getElementById("dashboardBalance").textContent = `$${balance.toFixed(2)}`;
+    };
+
+    const renderBudgetChart = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const income = budget.filter(entry => entry.type === "income").reduce((sum, entry) => sum + entry.amount, 0);
+        const expense = budget.filter(entry => entry.type === "expense").reduce((sum, entry) => sum + entry.amount, 0);
+
+        document.getElementById("dashboardBudget").appendChild(canvas);
+        canvas.id = "budgetChart";
+
+        new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels: ["Income", "Expense"],
+                datasets: [{
+                    backgroundColor: ["#81c784", "#e57373"],
+                    data: [income, expense],
+                }],
+            },
+        });
+    };
+
+    // Call these functions in the initialize function
     const initialize = () => {
         displayMotivationQuote();
         renderTasks();
         renderBudget();
         renderNotes();
+        renderDashboardTasks();
+        renderDashboardBudget();
+        renderDashboardNotes();
     };
 
     initialize();
 </script>
+</body>
+</html></script>
 </body>
 </html>
