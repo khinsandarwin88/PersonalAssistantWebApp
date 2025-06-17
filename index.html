@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🦖 Your Dino Personal Assistant! 🌿</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Balsamiq+Sans:wght@400;700&display=swap');
+
+        :root {
+            --font-main: 'Balsamiq Sans', cursive;
+            --font-secondary: 'Fredoka One', cursive;
+            --bg-main: #fff0f5; /* Light lavender pink */
+            --bg-section: #fffbf0; /* Soft cream */
+            --text-dark: #6a1b9a; /* Rich purple */
+            --text-light: #d1c4e9; /* Lavender */
+            --accent-primary: #ffb6c1; /* Light pink */
+            --accent-secondary: #ffe4e1; /* Misty rose */
+            --accent-highlight: #f8bbd0; /* Soft pink */
+            --color-success: #a5d6a7; /* Mint green */
+            --color-danger: #ef9a9a; /* Soft red */
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            --border-radius: 30px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 2.5rem;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+            animation: fadeIn var(--transition-speed) ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1.main-title {
+            font-family: var(--font-secondary);
+            font-size: 4.5rem;
+            color: var(--accent-primary);
+            text-shadow: 6px 6px 0px var(--text-dark),
+                         8px 8px 0px var(--color-success);
+            margin-bottom: 3rem;
+            letter-spacing: 4px;
+            line-height: 1.1;
+            animation: bounce var(--transition-speed) infinite alternate;
+        }
+
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(-10px);
+            }
+        }
+
+        .section {
+            background: var(--bg-section);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            border: 4px solid var(--accent-secondary);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        .section:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            font-family: var(--font-secondary);
+            margin-top: 0;
+            color: var(--text-dark);
+            border-bottom: 5px solid var(--text-light);
+            padding-bottom: 1.2rem;
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        button {
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            padding: 1.3rem;
+            border-radius: var(--border-radius);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            background-color: var(--accent-highlight);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 0;
+        }
+
+        li {
+            background: var(--accent-secondary);
+            margin-bottom: 1rem;
+            padding: 1.4rem;
+            border-radius: var(--border-radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            word-break: break-word;
+            border: 1px solid var(--accent-highlight);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+        }
+
+        li:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        li.completed span {
+            text-decoration: line-through;
+            opacity: 0.6;
+            color: var(--text-light);
+        }
+
+        li.important {
+            background-color: var(--accent-primary);
+            border-left: 8px solid var(--color-success);
+            box-shadow: 0 8px 18px rgba(255, 171, 145, 0.4);
+        }
+
+        .motivation-quote {
+            width: 100%;
+            max-width: 1400px;
+            background-color: var(--accent-secondary);
+            color: var(--text-dark);
+            text-align: center;
+            padding: 2.5rem 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 2.5rem;
+            font-size: 1.7rem;
+            font-weight: 700;
+            font-style: italic;
+            border: 4px solid var(--color-success);
+            line-height: 1.6;
+            animation: fadeIn var(--transition-speed) ease-in-out;
+        }
+
+        #motivation-author {
+            display: block;
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--color-danger);
+            font-size: 2.2rem;
+            cursor: pointer;
+            padding: 10px;
+            min-width: 45px;
+            transition: transform var(--transition-speed);
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.3) rotate(15deg);
+        }
+
+        /* Budget Specifics */
+        .budget-entry {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .budget-desc {
+            font-weight: 700;
+            font-size: 1.3em;
+            color: var(--text-dark);
+        }
+
+        .budget-category {
+            font-size: 1em;
+            background: var(--accent-highlight);
+            padding: 6px 12px;
+            border-radius: 12px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .budget-amount.income {
+            color: var(--color-success);
+            font-weight: 800;
+            font-size: 1.2em;
+        }
+
+        .budget-amount.expense {
+            color: var(--color-danger);
+            font-weight: 800;
+            font-size: 1.2em;
+        }
+
+        .budget-totals {
+            margin-top: 2.5rem;
+            padding-top: 2.5rem;
+            border-top: 4px solid var(--accent-primary);
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .total-value {
+            font-weight: 900;
+            display: block;
+            font-size: 1.8em;
+            margin-top: 10px;
+        }
+
+        #totalIncome {
+            color: var(--color-success);
+        }
+
+        #totalExpense {
+            color: var(--color-danger);
+        }
+
+        #finalBalance {
+            color: var(--text-dark);
+        }
+
+        /* Task Specifics */
+        .task-filters {
+            display: flex;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .task-filters button {
+            width: auto;
+            flex-grow: 1;
+            background: #e8f5e9;
+            color: var(--text-dark);
+            border: 2px solid var(--text-light);
+            padding: 1rem 1.4rem;
+            font-size: 1.05rem;
+        }
+
+        .task-filters button.active {
+            background: var(--accent-secondary);
+            color: var(--text-dark);
+            border-color: var(--accent-secondary);
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        .task-item input[type="checkbox"] {
+            width: 28px;
+            height: 28px;
+            accent-color: var(--color-success);
+            border-radius: 6px;
+        }
+
+        .task-details {
+            font-size: 0.95em;
+            color: var(--text-light);
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Notes Specifics */
+        .note-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .note-title {
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+            color: var(--text-dark);
+        }
+
+        .note-content {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+        }
+
+        /* Form Controls */
+        .form-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .form-group.vertical {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 28px;
+            height: 28px;
+            margin: 0;
+            accent-color: var(--accent-primary);
+            border-radius: 6px;
+        }
+
+        .checkbox-group label {
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 1.15rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5rem;
+            }
+
+            h1.main-title {
+                font-size: 3.5rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 1.8rem;
+            }
+
+            .motivation-quote {
+                font-size: 1.4rem;
+                padding: 1.5rem;
+            }
+
+            .budget-entry {
+                grid-template-columns: 1fr;
+            }
+
+            .budget-category {
+                grid-column: auto;
+                text-align: center;
+            }
+
+            body::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<h1 class="main-title">🦖 Your Dino Personal Assistant! 🌿</h1>
+
+<div class="motivation-quote">
+    <span id="motivation-text">"Roar with purpose! The jungle awaits your greatness!"</span><br/>
+    <em id="motivation-author">The Elders of the Valley</em>
+</div>
+
+<div class="main-container">
+
+    <div class="section">
+        <h2>🌿 Task Jungle</h2>
+        <div class="form-group vertical">
+            <input type="text" id="taskInput" placeholder="Hunt for a new task... 🍖" />
+            <input type="date" id="taskDate" />
+            <input type="time" id="taskTime" />
+            <div class="checkbox-group">
+                <input type="checkbox" id="taskImportant" />
+                <label for="taskImportant">Alpha Task? 👑</label>
+            </div>
+            <button onclick="addTask()">Stomp on it! 🦖</button>
+        </div>
+        <div class="task-filters">
+            <button id="filterAll" class="active" onclick="filterTasks('all')">All Expeditions</button>
+            <button id="filterActive" onclick="filterTasks('active')">Still Roaming</button>
+            <button id="filterCompleted" onclick="filterTasks('completed')">Conquered! 🔥</button>
+        </div>
+        <ul id="taskList"></ul>
+    </div>
+
+    <div class="section">
+        <h2>💎 Dino Budget</h2>
+        <div class="form-group vertical">
+            <input type="text" id="budgetDesc" placeholder="What shiny fossil did you find? (e.g., Rare Amber)" />
+            <input type="text" id="budgetCategory" placeholder="Fortune Type (e.g., Foraging, Nest Building)" />
+            <div class="form-group">
+                <input type="number" id="budgetAmount" placeholder="Amount (e.g., 5.00 glimmering geodes)" />
+                <select id="budgetType">
+                    <option value="expense">Spent (Uh oh! 😩)</option>
+                    <option value="income">Gained! (Cha-ching! ✨)</option>
+                </select>
+            </div>
+            <button onclick="addBudget()">Unearth Fortune! ⛏️</button>
+        </div>
+        <ul id="budgetList"></ul>
+        <div class="budget-totals">
+            <div>Gained!<span id="totalIncome" class="total-value">$0.00</span></div>
+            <div>Spent!<span id="totalExpense" class="total-value">$0.00</span></div>
+            <div>Balance<span id="finalBalance" class="total-value">$0.00</span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📜 Dino Notes</h2>
+        <div class="form-group vertical">
+            <input type="text" id="noteTitle" placeholder="A scroll title... (e.g., Best digging spots)" />
+            <textarea id="noteContent" placeholder="Scribe your ancient wisdom here... ✍️" rows="6"></textarea>
+            <div class="checkbox-group">
+                <input type="checkbox" id="noteImportant" />
+                <label for="noteImportant">Legendary Lore? 🌟</label>
+            </div>
+            <button onclick="addNote()">Scribe Scroll! 📝</button>
+        </div>
+        <ul id="noteList"></ul>
+    </div>
+
+</div>
+
+<script>
+    // --- UTILITIES ---
+    const load = (key, fallback = []) => {
+        try {
+            return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+        } catch (e) {
+            console.error(`Error loading ${key} from localStorage:`, e);
+            return fallback;
+        }
+    };
+
+    const save = (key, data) => {
+        try {
+            localStorage.setItem(key, JSON.stringify(data));
+        } catch (e) {
+            console.error(`Error saving ${key} to localStorage:`, e);
+        }
+    };
+
+    const createElement = (tag, attributes = {}, innerHTML = "") => {
+        const element = document.createElement(tag);
+        Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+        element.innerHTML = innerHTML;
+        return element;
+    };
+
+    const updateTotals = (income, expense) => {
+        document.getElementById("totalIncome").textContent = `$${income.toFixed(2)}`;
+        document.getElementById("totalExpense").textContent = `$${expense.toFixed(2)}`;
+        document.getElementById("finalBalance").textContent = `$${(income - expense).toFixed(2)}`;
+    };
+
+    // --- MOTIVATION OF THE DAY ---
+    const motivationQuotes = [
+        { text: "Roar with purpose! The jungle awaits your greatness!", author: "The Elders of the Valley" },
+        { text: "Stomp out your worries and dance with delight!", author: "Dancing Dino" },
+        { text: "Be as curious as a hatchling exploring new lands!", author: "Curious Compy" },
+        { text: "Grow tall and reach for the sunlight, like the mightiest ferns!", author: "Sunny Sauropod" },
+        { text: "Your roar is unique and powerful! Let it be heard!", author: "Voice of the Valley" },
+        { text: "Dig deep for your inner strength; it's there!", author: "Digger Dino" },
+        { text: "Every footprint you leave makes a path. Keep stomping!", author: "Pathfinder Dino" },
+        { text: "You're built for adventure! Go explore your potential!", author: "Adventurous Ankylosaurus" },
+        { text: "Gather your strengths like a mighty Triceratops!", "author": "Resilient Tricera" },
+        { text: "Let your ideas hatch and grow into something grand!", author: "Wise Pterodactyl" },
+        { text: "The ancient forests hold endless possibilities for you!", author: "Forest Guardian" },
+        { text: "Shine brighter than a freshly unearthed geode!", author: "Geode Glimmerer" }
+    ];
+
+    const displayMotivationQuote = () => {
+        const { text, author } = motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)];
+        document.getElementById("motivation-text").textContent = `"${text}"`;
+        document.getElementById("motivation-author").textContent = `- ${author}`;
+    };
+
+    // --- TASK MANAGER ---
+    let tasks = load("tasks", []);
+    let currentFilter = 'all';
+
+    const renderTasks = () => {
+        const list = document.getElementById("taskList");
+        list.innerHTML = tasks
+            .filter(task => currentFilter === 'all' || (currentFilter === 'active' ? !task.isCompleted : task.isCompleted))
+            .map(task => `
+                <li class="${task.isCompleted ? 'completed' : ''} ${task.isImportant ? 'important' : ''}">
+                    <div class="task-item">
+                        <input type="checkbox" ${task.isCompleted ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                        <div>
+                            <span>${task.text}</span>
+                            ${task.date ? `<span class="task-details">${task.date}${task.time ? ` at ${task.time}` : ''}</span>` : ''}
+                        </div>
+                    </div>
+                    <button class="delete-btn" onclick="removeTask(${task.id})">🦕</button>
+                </li>
+            `).join("") || `<li style="justify-content: center; color: var(--text-light);">The jungle is quiet. No tasks to hunt right now! 🦎</li>`;
+    };
+
+    const addTask = () => {
+        const taskText = document.getElementById("taskInput").value.trim();
+        if (!taskText) return alert("Rawr! Please describe your hunt!");
+
+        tasks.push({
+            id: Date.now(),
+            text: taskText,
+            isCompleted: false,
+            isImportant: document.getElementById("taskImportant").checked,
+            date: document.getElementById("taskDate").value,
+            time: document.getElementById("taskTime").value
+        });
+        save("tasks", tasks);
+        renderTasks();
+    };
+
+    const toggleTask = id => {
+        const task = tasks.find(task => task.id === id);
+        if (task) {
+            task.isCompleted = !task.isCompleted;
+            save("tasks", tasks);
+            renderTasks();
+        }
+    };
+
+    const removeTask = id => {
+        tasks = tasks.filter(task => task.id !== id);
+        save("tasks", tasks);
+        renderTasks();
+    };
+
+    const filterTasks = filter => {
+        currentFilter = filter;
+        document.querySelectorAll('.task-filters button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`filter${filter.charAt(0).toUpperCase() + filter.slice(1)}`).classList.add('active');
+        renderTasks();
+    };
+
+    // --- BUDGET TRACKER ---
+    let budget = load("budget", []);
+
+    const renderBudget = () => {
+        const list = document.getElementById("budgetList");
+        let totalIncome = 0, totalExpense = 0;
+
+        list.innerHTML = budget.map((entry, i) => {
+            if (entry.type === 'income') totalIncome += entry.amount;
+            else totalExpense += entry.amount;
+
+            return `
+                <li>
+                    <div class="budget-entry">
+                        <span class="budget-desc">${entry.desc}</span>
+                        <span class="budget-category">${entry.category}</span>
+                        <span class="budget-amount ${entry.type}">
+                            ${entry.type === 'income' ? '+' : '-'}$${entry.amount.toFixed(2)}
+                        </span>
+                    </div>
+                    <button class="delete-btn" onclick="removeBudget(${i})">🦕</button>
+                </li>
+            `;
+        }).join("") || `<li style="justify-content: center; color: var(--text-light);">The fossil beds are empty. 🦴</li>`;
+
+        updateTotals(totalIncome, totalExpense);
+    };
+
+    const addBudget = () => {
+        const desc = document.getElementById("budgetDesc").value.trim();
+        const category = document.getElementById("budgetCategory").value.trim();
+        const amount = parseFloat(document.getElementById("budgetAmount").value);
+        const type = document.getElementById("budgetType").value;
+
+        if (!desc || !category || isNaN(amount) || amount <= 0) return alert("Grrr! Please describe your treasure!");
+
+        budget.push({ desc, category, amount, type });
+        save("budget", budget);
+        renderBudget();
+    };
+
+    const removeBudget = index => {
+        budget.splice(index, 1);
+        save("budget", budget);
+        renderBudget();
+    };
+
+    // --- NOTES ---
+    let notes = load("notes", []);
+
+    const renderNotes = () => {
+        const list = document.getElementById("noteList");
+        list.innerHTML = notes.map((note, i) => `
+            <li class="note-item ${note.isImportant ? 'important' : ''}">
+                <div>
+                    <div class="note-title">${note.title}</div>
+                    <div class="note-content">${note.content.replace(/\n/g, '<br>')}</div>
+                </div>
+                <button class="delete-btn" onclick="removeNote(${i})">🦕</button>
+            </li>
+        `).join("") || `<li style="justify-content: center; color: var(--text-light);">No ancient wisdom recorded yet! 🎨</li>`;
+    };
+
+    const addNote = () => {
+        const title = document.getElementById("noteTitle").value.trim();
+        const content = document.getElementById("noteContent").value.trim();
+        if (!title || !content) return alert("Don't forget both a scroll title and wisdom!");
+
+        notes.push({
+            title,
+            content,
+            isImportant: document.getElementById("noteImportant").checked
+        });
+        save("notes", notes);
+        renderNotes();
+    };
+
+    const removeNote = index => {
+        notes.splice(index, 1);
+        save("notes", notes);
+        renderNotes();
+    };
+
+    // --- INITIALIZE APP ---
+    const initialize = () => {
+        displayMotivationQuote();
+        renderTasks();
+        renderBudget();
+        renderNotes();
+    };
+
+    initialize();
+</script>
+</body>
+</html>
